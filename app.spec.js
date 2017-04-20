@@ -21,7 +21,7 @@ describe('default routes', () => {
       });
   });
 
-  it.only('should return return a 404 error response for routes not defined', (done) => {
+  it('should return return a 404 error response for routes not defined', (done) => {
     chai.request(server)
       .get('/does-not-exist')
       .end((err, res) => {

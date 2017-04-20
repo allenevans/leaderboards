@@ -5,5 +5,6 @@
 module.exports = {
   development: require ('./developmentErrorHandler'),
   pageNotFound: require('./pageNotFoundErrorHandler'),
-  production: require ('./productionErrorHandler')
+  production: require ('./productionErrorHandler'),
+  typedErrorHandler: require ('./typedErrorHandler'),
 };
