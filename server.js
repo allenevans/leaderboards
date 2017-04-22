@@ -6,6 +6,8 @@ const http = require('http');
 const debug = require('debug')('scoreboard:api');
 const port = parseInt(process.env.PORT || '3000', 10);
 
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
 const app = require('./app');
 app.set('port', port);
 

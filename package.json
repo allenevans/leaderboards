@@ -4,8 +4,9 @@
   "description": "RESTful API Scoreboard system",
   "main": "index.js",
   "scripts": {
+    "docker-redis": "docker run --name scoreboard-redis-dev -p 6379:6379 -d redis",
     "start": "node bin/www",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_ENV=test mocha --opts mocha.opts"
   },
   "author": "Allen Evans",
   "license": "UNLICENSED",
@@ -20,6 +21,7 @@
     "ejs": "2.5.6",
     "express": "4.15.2",
     "morgan": "1.8.1",
+    "redis": "2.7.1",
     "serve-favicon": "2.4.2"
   }
 }

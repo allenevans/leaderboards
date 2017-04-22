@@ -25,6 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 require('./routes')(app);
 
 // error handlers
+app.use(errorHandlers.errorMapperHandler); // translate error types into http error types
 app.use(errorHandlers.typedErrorHandler); // handles known error types
 app.use(errorHandlers.pageNotFound); // catch 404 and forward to error handler
 app.use(isDevelopment ? errorHandlers.development : errorHandlers.production);

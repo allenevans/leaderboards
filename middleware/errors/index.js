@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------------ */
 module.exports = {
   development: require ('./developmentErrorHandler'),
+  errorMapperHandler: require ('./errorMapperHandler'),
   pageNotFound: require('./pageNotFoundErrorHandler'),
   production: require ('./productionErrorHandler'),
   typedErrorHandler: require ('./typedErrorHandler'),

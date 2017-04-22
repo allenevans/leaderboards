@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------------ */
 const chai = require('chai');
 const expect = chai.expect;
+const redis = require('../../providers/redisClient');
 const server = require('../../app');
 
 const chaiHttp = require('chai-http');
@@ -25,6 +26,9 @@ const invalidBoardName = {
 };
 
 describe('/boards endpoint', () => {
+  beforeEach((done) => redis.flushdb(done));
+  afterEach((done) => redis.flushdb(done));
+
   context('brand a new board', () => {
     it('should register a new user account and return a success response', (done) => {
       chai.request(server)
@@ -42,6 +46,26 @@ describe('/boards endpoint', () => {
   });
 
   context('data validation', () => {
+    beforeEach((done) => {
+      chai.request(server)
+        .post('/boards')
+        .send(board)
+        .end(done);
+    });
+
+    it('should not allow a board to be created if one already exists with the same id', (done) => {
+      chai.request(server)
+        .post('/boards')
+        .send(board)
+        .end((err, res) => {
+          expect(res).to.have.status(409);
+          expect(!!err).to.equal(true);
+          expect(res.headers['content-type']).to.contain('application/json');
+          expect(res.body.success).to.equal(false);
+          done();
+        });
+    });
+
     it('should validate all fields', (done) => {
       chai.request(server)
         .post('/boards')
