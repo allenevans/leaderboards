@@ -42,7 +42,18 @@ const get = (id) => {
   });
 };
 
+/**
+ * Delete a board by its id.
+ * @param id
+ */
+const remove = (id) => {
+  return new Promise((resolve, reject) => {
+    redis.del(boardKey(id), (err, data) => err ? reject(err) : resolve(data));
+  });
+};
+
 module.exports = {
   add,
-  get
+  get,
+  remove
 };
