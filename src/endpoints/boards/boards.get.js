@@ -1,18 +1,19 @@
 /*
  * File         :   boards.get.js
  * Description  :   Get a scoreboard by its id.
- * ------------------------------------------------------------------------------------------------ */
+ * -------------------------------------------------------------------------------------------------------------------------------------- */
 const Board = require('../../../src/services/boards/Board');
 const BoardGetResponse = require('./models/BoardGetResponse');
 const boardService = require('../../../src/services/boards/boardsService');
 const endpoint = require('express').Router();
 const NotFoundError = require('../../errors/http/NotFoundError');
 const MalformedRequestError = require('../../errors/http/MalformedRequestError');
+const simpleIdentifierValidate = require('../validation/simpleIdentifierValidate');
 
 endpoint.get('/boards/:id', (req, res, next) => {
   const errors = [];
 
-  if (!(/^([a-z]|\d|\-)+$/.test(req.params.id) && req.params.id.length <= 40)) { errors.push('id'); }
+  if (!simpleIdentifierValidate(req.params.id)) { errors.push('id'); }
 
   if (!errors.length) {
     boardService.get(req.params.id)

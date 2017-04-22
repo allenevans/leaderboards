@@ -1,9 +1,10 @@
 /*
  * File         :   boardsService.js
  * Description  :   Data manipulation services for board entities.
- * ------------------------------------------------------------------------------------------------ */
+ * -------------------------------------------------------------------------------------------------------------------------------------- */
 const Board = require('./Board');
 const redis = require('../../providers/redisClient');
+const RecordNotFoundError = require('../../errors/db/RecordNotFoundError');
 const UniqueConflictError = require('../../errors/db/UniqueConflictError');
 
 const boardKey = (boardId) => `sb:${boardId}`;
@@ -21,7 +22,7 @@ const add = (board) => {
 
       return new Promise((resolve, reject) => {
         redis
-          .set(boardKey(board.id), Board.serialize(board), (err) => {
+          .set(boardKey(board.id), Board.serialize(new Board(board)), (err) => {
             if (err) {
               reject(err);
             } else {
@@ -52,8 +53,32 @@ const remove = (id) => {
   });
 };
 
+/**
+ * Get a board by its id.
+ * @param id
+ * @param model
+ */
+const update = (id, model) => {
+  return get(id)
+    .then((board) => {
+      if (!board) { return Promise.reject(new RecordNotFoundError(boardKey(id))); }
+
+      return new Promise((resolve, reject) => {
+        redis
+          .set(boardKey(board.id), Board.serialize(new Board(Object.assign(board, model))), (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(board.id);
+            }
+          });
+      });
+    });
+};
+
 module.exports = {
   add,
   get,
-  remove
+  remove,
+  update
 };

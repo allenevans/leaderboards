@@ -1,16 +1,10 @@
 /*
- * File         :   BoardPostRequest.js
- * Description  :   Board POST request model.
+ * File         :   BoardPutRequest.js
+ * Description  :   Board PUT request model.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 const boardNameValidate = require('../../validation/boardNameValidate');
-const simpleIdentifierValidate = require('../../validation/simpleIdentifierValidate');
 
 const validation = [
-  {
-    field: 'id',
-    validate: simpleIdentifierValidate,
-    nullable: false
-  },
   {
     field: 'name',
     validate: boardNameValidate,
@@ -18,20 +12,19 @@ const validation = [
   }
 ];
 
-class BoardPostRequest {
+class BoardPutRequest {
   constructor() {
-    this.id = null;
     this.name = null;
   }
 }
 
 /**
- * Parse JSON object into a BoardPostRequest
+ * Parse JSON object into a BoardPutRequest
  * @param data
- * @returns {BoardPostRequest}
+ * @returns {BoardPutRequest}
  */
-BoardPostRequest.parse = (data) => {
-  const request = new BoardPostRequest();
+BoardPutRequest.parse = (data) => {
+  const request = new BoardPutRequest();
 
   Object.keys(request).forEach((key) => {
     if (data.hasOwnProperty(key)) {
@@ -46,7 +39,7 @@ BoardPostRequest.parse = (data) => {
  * Validate fields, return an array of errors.
  * @param data
  */
-BoardPostRequest.validate = (data) => Object.keys(new BoardPostRequest())
+BoardPutRequest.validate = (data) => Object.keys(new BoardPutRequest())
     .filter(
       (key) => {
         const rule = validation.filter((rule) => rule.field === key)[0];
@@ -62,6 +55,6 @@ BoardPostRequest.validate = (data) => Object.keys(new BoardPostRequest())
  * Return boolean flag indicating if the request is valid.
  * @param data
  */
-BoardPostRequest.isValid = (data) => BoardPostRequest.validate(data).length === 0;
+BoardPutRequest.isValid = (data) => BoardPutRequest.validate(data).length === 0;
 
-module.exports = BoardPostRequest;
+module.exports = BoardPutRequest;

@@ -1,7 +1,7 @@
 /*
  * File         :   UniqueConflictError.js
  * Description  :   A database error indicating that a unique record already exists for the given criteria.
- * ------------------------------------------------------------------------------------------------ */
+ * -------------------------------------------------------------------------------------------------------------------------------------- */
 const DbError = require('./DbError');
 
 class UniqueConflictError extends DbError {
@@ -12,7 +12,7 @@ class UniqueConflictError extends DbError {
       ...args
     );
 
-    Error.captureStackTrace(this, DbError);
+    Error.captureStackTrace(this, UniqueConflictError);
   }
 }
 

@@ -1,30 +1,30 @@
 /*
- * File         :   boards.delete.js
- * Description  :   Delete a scoreboard by its id.
+ * File         :   boards.put.js
+ * Description  :   Update the scoreboard identified by its id.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 const Board = require('../../../src/services/boards/Board');
-const BoardDeleteResponse = require('./models/BoardDeleteResponse');
+const BoardPutRequest = require('./models/BoardPutRequest');
+const BoardPutResponse = require('./models/BoardPutResponse');
 const boardService = require('../../../src/services/boards/boardsService');
 const endpoint = require('express').Router();
-const NotFoundError = require('../../errors/http/NotFoundError');
 const MalformedRequestError = require('../../errors/http/MalformedRequestError');
 const simpleIdentifierValidate = require('../validation/simpleIdentifierValidate');
 
-endpoint.delete('/boards/:id', (req, res, next) => {
+endpoint.put('/boards/:id', (req, res, next) => {
   const errors = [];
-
   if (!simpleIdentifierValidate(req.params.id)) { errors.push('id'); }
 
-  if (!errors.length) {
-    boardService.remove(req.params.id)
-      .then((board) => board ?
+  const model = BoardPutRequest.parse(req.body);
+
+  if (BoardPutRequest.isValid(model)) {
+    boardService.update(req.params.id, model)
+      .then((boardId) =>
         res.status(200)
-          .send(BoardDeleteResponse.parse({id: req.params.id})) :
-        next(new NotFoundError(`No board found for key ${req.params.id}`))
+          .send(new BoardPutResponse(boardId))
       )
       .catch(next);
   } else {
-    next(new MalformedRequestError(errors));
+    next(new MalformedRequestError(BoardPutRequest.validate(model)));
   }
 });
 
