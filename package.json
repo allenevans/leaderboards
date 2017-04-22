@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "docker-redis": "docker run --name scoreboard-redis-dev -p 6379:6379 -d redis",
+    "lint": "eslint ./src/**/*.js",
     "start": "node bin/www",
     "test": "NODE_ENV=test mocha --opts mocha.opts"
   },
@@ -13,7 +14,9 @@
   "devDependencies": {
     "chai": "3.5.0",
     "chai-http": "3.0.0",
-    "mocha": "3.2.0"
+    "eslint": "3.19.0",
+    "mocha": "3.2.0",
+    "pre-commit": "1.2.2"
   },
   "dependencies": {
     "body-parser": "1.17.1",
@@ -23,5 +26,12 @@
     "morgan": "1.8.1",
     "redis": "2.7.1",
     "serve-favicon": "2.4.2"
+  },
+  "pre-commit": {
+    "silent": true,
+    "run": [
+      "test",
+      "lint"
+    ]
   }
 }

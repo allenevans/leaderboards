@@ -5,7 +5,7 @@
 const chai = require('chai');
 const expect = chai.expect;
 const redis = require('../../providers/redisClient');
-const server = require('../../app');
+const server = require('../../../src/app');
 
 const chaiHttp = require('chai-http');
 chai.use(chaiHttp);

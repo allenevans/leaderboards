@@ -3,5 +3,5 @@
  * Description  :   Endpoints index registration.
  * ------------------------------------------------------------------------------------------------ */
 module.exports = (app) => {
-  require('./boards')(app);
+  require('./boards/index')(app);
 };

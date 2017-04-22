@@ -5,7 +5,7 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
-const errorHandlers = require('./middleware/errors');
+const errorHandlers = require('./middleware/errors/index');
 
 const app = express();
 const isDevelopment = app.get('env') === 'development';
@@ -22,7 +22,7 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-require('./routes')(app);
+require('./routes/index')(app);
 
 // error handlers
 app.use(errorHandlers.errorMapperHandler); // translate error types into http error types

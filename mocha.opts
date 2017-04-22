@@ -1,5 +1,5 @@
 --reporter dot
 --colors
 --project ./
-./config/mocha.config.js
-./**/*.spec.js
+./mocha.config.js
+./src/**/*.spec.js
