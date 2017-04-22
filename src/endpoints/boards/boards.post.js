@@ -9,9 +9,6 @@ const boardService = require('../../../src/services/boards/boardsService');
 const endpoint = require('express').Router();
 const MalformedRequestError = require('../../errors/http/MalformedRequestError');
 
-/**
- * Register a new user
- */
 endpoint.post('/boards', (req, res, next) => {
   const model = BoardPostRequest.parse(req.body);
 

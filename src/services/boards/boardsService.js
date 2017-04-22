@@ -38,7 +38,7 @@ const add = (board) => {
  */
 const get = (id) => {
   return new Promise((resolve, reject) => {
-    redis.get(boardKey(id), (err, data) => err ? reject(err) : resolve(data));
+    redis.get(boardKey(id), (err, data) => err ? reject(err) : resolve(data && Board.deserialize(data)));
   });
 };
 

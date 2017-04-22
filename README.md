@@ -7,6 +7,7 @@ API
 ---
 ```/boards```
 
+    GET:    Retrieve a score board by its id.
     POST:   Create a new board for keeping track of scores.
     
      
