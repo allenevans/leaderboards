@@ -1,7 +1,7 @@
 /*
  * File         :   Board.js
- * Description  :   Scoreboard database model.
- * ------------------------------------------------------------------------------------------------ */
+ * Description  :   Leaderboard database model.
+ * -------------------------------------------------------------------------------------------------------------------------------------- */
 class Board {
   constructor(params) {
     this.id = null;

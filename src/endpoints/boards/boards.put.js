@@ -1,6 +1,6 @@
 /*
  * File         :   boards.put.js
- * Description  :   Update the scoreboard identified by its id.
+ * Description  :   Update the leaderboard identified by its id.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 const Board = require('../../../src/services/boards/Board');
 const BoardPutRequest = require('./models/BoardPutRequest');

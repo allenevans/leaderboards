@@ -1,6 +1,6 @@
 /*
  * File         :   scores.post.js
- * Description  :   Post a score to a scoreboard.
+ * Description  :   Post a score to a leaderboard.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 const endpoint = require('express').Router();
 const MalformedRequestError = require('../../errors/http/MalformedRequestError');

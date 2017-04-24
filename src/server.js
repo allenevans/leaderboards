@@ -1,9 +1,9 @@
 /*
  * File         :   server.js
- * Description  :   Scoreboard server entry point.
- * ------------------------------------------------------------------------------------------------ */
+ * Description  :   Leaderboard server entry point.
+ * -------------------------------------------------------------------------------------------------------------------------------------- */
 const http = require('http');
-const debug = require('debug')('scoreboard:api');
+const debug = require('debug')('leaderboard:api');
 const port = parseInt(process.env.PORT || '3000', 10);
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';

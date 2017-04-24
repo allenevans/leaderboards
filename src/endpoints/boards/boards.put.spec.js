@@ -27,7 +27,7 @@ describe('/boards endpoint', () => {
         .end(done);
     });
 
-    it('should be able to update an existing scoreboard', (done) => {
+    it('should be able to update an existing leaderboard', (done) => {
       const modify = {
         name: board.name + ' updated'
       };

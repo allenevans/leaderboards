@@ -1,6 +1,6 @@
 /*
  * File         :   boards.get.js
- * Description  :   Get a scoreboard by its id.
+ * Description  :   Get a leaderboard by its id.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 const Board = require('../../../src/services/boards/Board');
 const BoardGetResponse = require('./models/BoardGetResponse');

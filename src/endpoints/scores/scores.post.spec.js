@@ -61,7 +61,7 @@ describe('/scores endpoint', () => {
         });
     });
 
-    it('should validate that the scoreboard specified exists', (done) => {
+    it('should validate that the leaderboard specified exists', (done) => {
       chai.request(server)
         .post('/scores')
         .send({

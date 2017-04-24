@@ -1,6 +1,6 @@
 /*
  * File         :   boards.delete.js
- * Description  :   Delete a scoreboard by its id.
+ * Description  :   Delete a leaderboard by its id.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 const Board = require('../../../src/services/boards/Board');
 const BoardDeleteResponse = require('./models/BoardDeleteResponse');

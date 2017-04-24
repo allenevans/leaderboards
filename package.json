@@ -1,10 +1,10 @@
 {
-  "name": "scoreboard",
+  "name": "leaderboards",
   "version": "0.0.1",
-  "description": "RESTful API Scoreboard system",
+  "description": "RESTful API Leaderboard system",
   "main": "index.js",
   "scripts": {
-    "docker-redis": "docker run --name scoreboard-redis-dev -p 6379:6379 -d redis",
+    "docker-redis": "docker run --name leaderboard-redis-dev -p 6379:6379 -d redis",
     "lint": "eslint ./src/**/*.js",
     "start": "node bin/www",
     "test": "NODE_ENV=test mocha --opts mocha.opts"

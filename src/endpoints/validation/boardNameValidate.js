@@ -1,6 +1,6 @@
 /*
  * File         :   boardNameValidate.js
- * Description  :   Validate a scoreboard name.
+ * Description  :   Validate a leaderboard name.
  *                  Name can consist of characters a-z, and dash `-` and must not exceed 100 characters.
  *                  Name must begin with a character.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
