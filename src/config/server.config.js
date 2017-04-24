@@ -18,5 +18,5 @@ const redisConfig = {
 module.exports = {
   redis: redisConfig[process.env.NODE_ENV],
   secret: 'Shhhh!!!, this is the secret key that should not be shared.',
-  tokenDuration: 60 * 60 * 12 // 12 hours
+  tokenDuration: 10 // seconds
 };

@@ -1,7 +1,7 @@
 /*
  * File         :   MalformedRequestError.js
  * Description  :   Error to use when a request is not correctly formed.
- * ------------------------------------------------------------------------------------------------ */
+ * -------------------------------------------------------------------------------------------------------------------------------------- */
 const HttpError = require('./HttpError');
 
  class MalformedRequestError extends HttpError {

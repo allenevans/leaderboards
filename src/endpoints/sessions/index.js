@@ -1,10 +1,7 @@
 /*
  * File         :   index.js
- * Description  :   Endpoints index registration.
+ * Description  :   sessions route index.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 module.exports = (app) => {
-  require('./apps/index')(app);
-  require('./boards/index')(app);
-  require('./scores/index')(app);
-  require('./sessions/index')(app);
+  app.use(require('./sessions.post'));
 };

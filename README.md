@@ -11,7 +11,7 @@ API
     
 ```/apps/<app-id>```
 
-    GET:   Retrive an application by its id.
+    GET:    Retrive an application by its id.
 
 ```/boards```
 
@@ -31,3 +31,8 @@ API
 ```/scores/<board-id>```
 
     GET:    Get the scores for a board
+
+```/sessions```
+
+    POST:   Create a new JWT token and return to the client.
+            This token is a short-lived token required when posting scores to a scoreboard.

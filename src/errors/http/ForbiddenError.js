@@ -1,17 +1,17 @@
 /*
- * File         :   ResourceConflictError.js
- * Description  :   HTTP 409 error
+ * File         :   ForbiddenError.js
+ * Description  :   HTTP 403 error
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 const HttpError = require('./HttpError');
 
-class ResourceConflictError extends HttpError {
+class ForbiddenError extends HttpError {
   constructor(detail, ...args) {
     super(...args);
-    Error.captureStackTrace(this, ResourceConflictError);
+    Error.captureStackTrace(this, ForbiddenError);
 
-    this.status = 409;
+    this.status = 403;
     this.detail = detail;
   }
 }
 
-module.exports = ResourceConflictError;
+module.exports = ForbiddenError;
