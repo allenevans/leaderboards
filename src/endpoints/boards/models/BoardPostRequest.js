@@ -4,10 +4,11 @@
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 const boardNameValidate = require('../../validation/boardNameValidate');
 const BoardOrder = require('../../../types/BoardOrder');
+const requestModelValidate = require('../../validation/requestModelValidate');
 const simpleIdentifierValidate = require('../../validation/simpleIdentifierValidate');
 const valueTypeValidate = require('../../validation/valueTypeValidate');
 
-const validation = [
+const rules = [
   {
     field: 'id',
     validate: simpleIdentifierValidate,
@@ -58,17 +59,7 @@ BoardPostRequest.parse = (data) => {
  * Validate fields, return an array of errors.
  * @param data
  */
-BoardPostRequest.validate = (data) => Object.keys(new BoardPostRequest())
-    .filter(
-      (key) => {
-        const rule = validation.filter((rule) => rule.field === key)[0];
-
-        return rule && (
-            (!rule.optional && (data[key] === null || data[key] === undefined)) ||
-            (data[key] !== null && !rule.validate(data[key]))
-          );
-      }
-    );
+BoardPostRequest.validate = requestModelValidate(BoardPostRequest, rules);
 
 /**
  * Return boolean flag indicating if the request is valid.
