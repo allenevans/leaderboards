@@ -5,26 +5,16 @@
 const chai = require('chai');
 const expect = chai.expect;
 const redis = require('../../providers/redisClient');
+const seedBoards = require('../../tests/seedBoards');
 const server = require('../../../src/app');
 
 const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 
-const board = {
-  id: 'my-game-score-board',
-  name: 'My Game Score Board',
-  order: 'lowestFirst'
-};
+let board = {};
 
-describe('/scores endpoint', () => {
-  beforeEach((done) => {
-    redis.flushdb(() => {
-      chai.request(server)
-        .post('/boards')
-        .send(board)
-        .end(done);
-    })
-  });
+describe('/scores endpoint => POST', () => {
+  beforeEach((done) => redis.flushdb(() => seedBoards(1).then((boards) => board = boards[0]).then(() => done())));
   afterEach((done) => redis.flushdb(done));
 
   context('adding scores', () => {

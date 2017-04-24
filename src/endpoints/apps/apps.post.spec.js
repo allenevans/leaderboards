@@ -1,64 +1,51 @@
 /*
- * File         :   boards.put.spec.js
- * Description  :   boards PUT endpoint tests.
+ * File         :   apps.post.spec.js
+ * Description  :   apps POST endpoint tests.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 const chai = require('chai');
 const expect = chai.expect;
 const redis = require('../../providers/redisClient');
-const seedBoards = require('../../tests/seedBoards');
+const seedApps = require('../../tests/seedApps');
 const server = require('../../../src/app');
 
 const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 
-let boards = null;
+let seededApps = null;
 
-describe('/boards endpoint => PUT', () => {
-  beforeEach((done) => redis.flushdb(() => seedBoards(2).then((seeded) => boards = seeded).then(() => done())));
+describe('/apps endpoint => POST', () => {
+  beforeEach((done) => redis.flushdb(() => seedApps(1).then((seeded) => seededApps = seeded).then(() => done())));
   afterEach((done) => redis.flushdb(done));
 
-  context('update existing boards', () => {
-    it('should be able to update an existing leaderboard', (done) => {
-      const modify = {
-        name: boards[0].name + ' updated'
+  context('brand a new board', () => {
+    it('should register a new app and return a success response', (done) => {
+      const app = {
+        name: 'My new shiny app'
       };
-      
+
       chai.request(server)
-        .put(`/boards/${boards[0].id}`)
-        .send(modify)
+        .post('/apps')
+        .send(app)
         .end((err, res) => {
-          expect(res).to.have.status(200);
+          expect(res).to.have.status(201);
           expect(err).to.equal(null);
           expect(res.headers['content-type']).to.contain('application/json');
           expect(res.body.success).to.equal(true);
-          expect(res.body.id).to.equal(boards[0].id);
+          expect(!!res.body.id).to.equal(true);
           done();
         });
     });
   });
 
-  context('error cases', () => {
-    it('should return 404 if the board does not exist', (done) => {
-      chai.request(server)
-        .put(`/boards/does-not-exist`)
-        .send({ name: 'something' })
-        .end((err, res) => {
-          expect(res).to.have.status(404);
-          expect(!!err).to.equal(true);
-          expect(res.headers['content-type']).to.contain('application/json');
-          expect(res.body.success).to.equal(false);
-          done();
-        });
-    });
-
-    it('should not process invalid board name', (done) => {
-      const modify = {
-        name: 'An Invalid Name!'
+  context('data validation', () => {
+    it('should not allow an to be created if one already exists with the same name', (done) => {
+      const app = {
+        name: seededApps[0]
       };
-      
+
       chai.request(server)
-        .put(`/boards/${boards[1].id}`)
-        .send(modify)
+        .post('/apps')
+        .send(app)
         .end((err, res) => {
           expect(res).to.have.status(400);
           expect(!!err).to.equal(true);
@@ -69,20 +56,33 @@ describe('/boards endpoint => PUT', () => {
         });
     });
 
-    it('should not process invalid order', (done) => {
-      const modify = {
-        order: 'random'
-      };
-
+    it('should validate all fields', (done) => {
       chai.request(server)
-        .put(`/boards/${boards[0].id}`)
-        .send(modify)
+        .post('/apps')
+        .send({})
         .end((err, res) => {
           expect(res).to.have.status(400);
           expect(!!err).to.equal(true);
           expect(res.headers['content-type']).to.contain('application/json');
           expect(res.body.success).to.equal(false);
-          expect(res.body.fields).to.deep.equal(['order']);
+          expect(res.body.fields).to.deep.equal(['name']);
+          done();
+        });
+    });
+
+    it('should validate all field values', (done) => {
+      const app = {
+        name: '    INVALID'
+      };
+      chai.request(server)
+        .post('/apps')
+        .send(app)
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          expect(!!err).to.equal(true);
+          expect(res.headers['content-type']).to.contain('application/json');
+          expect(res.body.success).to.equal(false);
+          expect(res.body.fields).to.deep.equal(['name']);
           done();
         });
     });

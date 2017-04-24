@@ -1,9 +1,7 @@
 /*
  * File         :   index.js
- * Description  :   Endpoints index registration.
+ * Description  :   applications route index.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 module.exports = (app) => {
-  require('./apps/index')(app);
-  require('./boards/index')(app);
-  require('./scores/index')(app);
+  app.use(require('./apps.post'));
 };

@@ -5,39 +5,29 @@
 const chai = require('chai');
 const expect = chai.expect;
 const redis = require('../../providers/redisClient');
+const seedBoards = require('../../tests/seedBoards');
 const server = require('../../../src/app');
 
 const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 
-const board = {
-  id: 'my-game-score-board',
-  name: 'My Game Score Board',
-  order: 'lowestFirst'
-};
+let boards = null;
 
-describe('/boards endpoint', () => {
-  beforeEach((done) => redis.flushdb(done));
+describe('/boards endpoint => GET', () => {
+  beforeEach((done) => redis.flushdb(() => seedBoards(1).then((seeded) => boards = seeded).then(() => done())));
   afterEach((done) => redis.flushdb(done));
 
   context('retrieve existing boards', () => {
-    beforeEach((done) => {
-      chai.request(server)
-        .post('/boards')
-        .send(board)
-        .end(done);
-    });
-
     it('should retrieve an existing board', (done) => {
       chai.request(server)
-        .get(`/boards/${board.id}`)
+        .get(`/boards/${boards[0].id}`)
         .end((err, res) => {
           expect(res).to.have.status(200);
           expect(err).to.equal(null);
           expect(res.headers['content-type']).to.contain('application/json');
           expect(res.body.success).to.equal(true);
-          expect(res.body.id).to.equal(board.id);
-          expect(res.body.name).to.equal(board.name);
+          expect(res.body.id).to.equal(boards[0].id);
+          expect(res.body.name).to.equal(boards[0].name);
           done();
         });
     });

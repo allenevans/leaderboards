@@ -7,12 +7,17 @@ const BoardOrder = require('../../types/BoardOrder');
 class Board {
   constructor(params) {
     this.id = null;
+    this.appId = null;
     this.name = null;
     this.order = BoardOrder.lowestFirst;
 
     Object.keys(this).forEach((key) => {
       if ((params || {}).hasOwnProperty(key)) {
-        this[key] = params[key];
+        if (key === 'order') {
+          this[key] = BoardOrder.parse(params[key]);
+        } else {
+          this[key] = params[key];
+        }
       }
     });
   }

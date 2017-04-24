@@ -5,22 +5,14 @@
 const chai = require('chai');
 const expect = chai.expect;
 const redis = require('../../providers/redisClient');
+const seedBoards = require('../../tests/seedBoards');
 const server = require('../../../src/app');
 
 const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 
-const boardLowestFirst = {
-  id   : 'my-game-score-board-low',
-  name : 'My Game Score Board - Low',
-  order: 'lowestFirst'
-};
-
-const boardHighestFirst = {
-  id   : 'my-game-score-board-high',
-  name : 'My Game Score Board - High',
-  order: 'highestFirst'
-};
+let boardLowestFirst = {};
+let boardHighestFirst = {};
 
 const seededScores = [
   {player: 'player A', score: 1000},
@@ -44,13 +36,6 @@ const seededScores = [
   {player: 'player R', score: 5000}
 ];
 
-const seedBoard = (board) => new Promise((resolve) => {
-  chai.request(server)
-    .post('/boards')
-    .send(board)
-    .end(resolve);
-});
-
 const seedScore = (boardId, score, player) => new Promise((resolve) => {
   chai.request(server)
     .post('/scores')
@@ -63,47 +48,59 @@ const seedScore = (boardId, score, player) => new Promise((resolve) => {
     .end(resolve);
 });
 
-const seedDb = (board) =>
-  seedBoard(board)
-    .then(() => Promise.all(seededScores.map(seed => seedScore(board.id, seed.score, seed.player))));
+const seedDb = () =>
+  seedBoards(2,
+    [
+      {
+        id   : 'my-apps-score-board-low',
+        name : 'My Game Score Board - Low',
+        order: 'lowestFirst'
+      },
+      {
+        id   : 'my-apps-score-board-high',
+        name : 'My Game Score Board - High',
+        order: 'highestFirst'
+      }
+    ])
+    .then(([lowest, highest]) => [boardLowestFirst, boardHighestFirst] = [lowest, highest])
+    .then(() => Promise.all([
+      ...seededScores.map(seed => seedScore(boardLowestFirst.id, seed.score, seed.player)),
+      ...seededScores.map(seed => seedScore(boardHighestFirst.id, seed.score, seed.player))
+    ]));
 
-describe('/scores endpoint', () => {
-  beforeEach((done) => redis.flushdb(done));
+describe('/scores endpoint => GET', () => {
+  beforeEach((done) => redis.flushdb(() => seedDb().then(() => done())));
   afterEach((done) => redis.flushdb(done));
 
   context('get leaderboard scores', () => {
     it('can get the scores for a leaderboard - lowestFirst', (done) => {
-      seedDb(boardLowestFirst).then(() => {
-        chai.request(server)
-          .get(`/scores/${boardLowestFirst.id}`)
-          .end((err, res) => {
-            expect(res).to.have.status(200);
-            expect(err).to.equal(null);
-            expect(res.headers['content-type']).to.contain('application/json');
-            expect(res.body.success).to.equal(true);
-            expect(res.body.leaderboard.length).to.equal(seededScores.length);
-            expect(res.body.leaderboard[0].player).to.equal('player J');
-            expect(res.body.leaderboard[0].rank).to.equal(1);
-            done();
-          });
-      });
+      chai.request(server)
+        .get(`/scores/${boardLowestFirst.id}`)
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          expect(err).to.equal(null);
+          expect(res.headers['content-type']).to.contain('application/json');
+          expect(res.body.success).to.equal(true);
+          expect(res.body.leaderboard.length).to.equal(seededScores.length);
+          expect(res.body.leaderboard[0].player).to.equal('player J');
+          expect(res.body.leaderboard[0].rank).to.equal(1);
+          done();
+        });
     });
 
     it('can get the scores for a leaderboard - highestFirst', (done) => {
-      seedDb(boardHighestFirst).then(() => {
-        chai.request(server)
-          .get(`/scores/${boardHighestFirst.id}`)
-          .end((err, res) => {
-            expect(res).to.have.status(200);
-            expect(err).to.equal(null);
-            expect(res.headers['content-type']).to.contain('application/json');
-            expect(res.body.success).to.equal(true);
-            expect(res.body.leaderboard.length).to.equal(seededScores.length);
-            expect(res.body.leaderboard[0].player).to.equal('player I');
-            expect(res.body.leaderboard[0].rank).to.equal(1);
-            done();
-          });
-      });
+      chai.request(server)
+        .get(`/scores/${boardHighestFirst.id}`)
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          expect(err).to.equal(null);
+          expect(res.headers['content-type']).to.contain('application/json');
+          expect(res.body.success).to.equal(true);
+          expect(res.body.leaderboard.length).to.equal(seededScores.length);
+          expect(res.body.leaderboard[0].player).to.equal('player I');
+          expect(res.body.leaderboard[0].rank).to.equal(1);
+          done();
+        });
     });
   });
 });

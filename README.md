@@ -5,6 +5,10 @@ RESTful api microservice for creating leaderboards to keep track of players scor
 
 API
 ---
+```/apps```
+
+    POST:   Create a new application that boards can be linked to.
+
 ```/boards```
 
     POST:   Create a new board for keeping track of scores.

@@ -1,7 +1,7 @@
 /*
  * File         :   boards.post.js
  * Description  :   Create a new board with the given id.
- * ------------------------------------------------------------------------------------------------ */
+ * -------------------------------------------------------------------------------------------------------------------------------------- */
 const Board = require('../../../src/services/boards/Board');
 const BoardPostRequest = require('./models/BoardPostRequest');
 const BoardPostResponse = require('./models/BoardPostResponse');

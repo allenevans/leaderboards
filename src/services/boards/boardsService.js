@@ -2,9 +2,10 @@
  * File         :   boardsService.js
  * Description  :   Data manipulation services for board entities.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
+const appsService = require('../apps/appsService');
 const Board = require('./Board');
-const redis = require('../../providers/redisClient');
 const RecordNotFoundError = require('../../errors/db/RecordNotFoundError');
+const redis = require('../../providers/redisClient');
 const UniqueConflictError = require('../../errors/db/UniqueConflictError');
 
 const boardKey = (boardId) => `sb:${boardId}`;
@@ -14,10 +15,14 @@ const boardKey = (boardId) => `sb:${boardId}`;
  * @param board
  */
 const add = (board) => {
-  return get(board.id)
-    .then((exists) => {
-      if (exists) {
+  return Promise.all([get(board.id), appsService.get(board.appId)])
+    .then(([boardExists, app]) => {
+      if (boardExists) {
         return Promise.reject(new UniqueConflictError(board.id));
+      }
+
+      if (!app) {
+        return Promise.reject(new RecordNotFoundError(`Application not found`));
       }
 
       return new Promise((resolve, reject) => {

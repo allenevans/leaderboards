@@ -6,12 +6,18 @@ const boardNameValidate = require('../../validation/boardNameValidate');
 const BoardOrder = require('../../../types/BoardOrder');
 const requestModelValidate = require('../../validation/requestModelValidate');
 const simpleIdentifierValidate = require('../../validation/simpleIdentifierValidate');
+const uuidValidate = require('../../validation/uuidValidate');
 const valueTypeValidate = require('../../validation/valueTypeValidate');
 
 const rules = [
   {
     field: 'id',
     validate: simpleIdentifierValidate,
+    optional: false
+  },
+  {
+    field: 'appId',
+    validate: uuidValidate,
     optional: false
   },
   {
@@ -29,6 +35,7 @@ const rules = [
 class BoardPostRequest {
   constructor() {
     this.id = null;
+    this.appId = null;
     this.name = null;
     this.order = null;
   }

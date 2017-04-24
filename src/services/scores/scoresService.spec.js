@@ -8,11 +8,9 @@ const expect = require('chai').expect;
 const redis = require('../../providers/redisClient');
 const Score = require('./Score');
 const scoresService = require('./scoresService');
+const seedBoards = require('../../tests/seedBoards');
 
-const board = new Board({
-  id  : 'test-board',
-  name: 'Test Board'
-});
+let board = {};
 
 const highScore = new Score({
   player   : 'player 1',
@@ -37,12 +35,10 @@ const getRank = (key, member) => new Promise((resolve, reject) =>
 );
 
 describe('scoresService integration tests', () => {
-  beforeEach((done) => redis.flushdb(done));
+  beforeEach((done) => redis.flushdb(() => seedBoards(1).then((boards) => board = boards[0]).then(() => done())));
   afterEach((done) => redis.flushdb(done));
 
   context('adding new scores', () => {
-    beforeEach(() => boardsService.add(board));
-
     it('should add a score to the all time leaderboard', () =>
       scoresService.add(board.id, highScore)
         .then(() => getRank(`sc:${board.id}:a`, highScore.player))
