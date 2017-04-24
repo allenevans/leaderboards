@@ -8,6 +8,10 @@ API
 ```/apps```
 
     POST:   Create a new application that boards can be linked to.
+    
+```/apps/<app-id>```
+
+    GET:   Retrive an application by its id.
 
 ```/boards```
 

@@ -6,6 +6,6 @@
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 const applicationNameValidate = (value) => {
   return value && /^\w([\w\s]+)\w$/i.test(value) && value.length <= 100;
-}
+};
 
 module.exports = applicationNameValidate;
