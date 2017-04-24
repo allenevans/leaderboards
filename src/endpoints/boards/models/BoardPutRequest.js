@@ -3,18 +3,26 @@
  * Description  :   Board PUT request model.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 const boardNameValidate = require('../../validation/boardNameValidate');
+const BoardOrder = require('../../../types/BoardOrder');
+const valueTypeValidate = require('../../validation/valueTypeValidate');
 
 const validation = [
   {
     field: 'name',
     validate: boardNameValidate,
-    nullable: false
+    optional: true
+  },
+  {
+    field: 'order',
+    validate: valueTypeValidate(BoardOrder),
+    optional: true
   }
 ];
 
 class BoardPutRequest {
   constructor() {
     this.name = null;
+    this.order = null;
   }
 }
 
@@ -28,7 +36,11 @@ BoardPutRequest.parse = (data) => {
 
   Object.keys(request).forEach((key) => {
     if (data.hasOwnProperty(key)) {
-      request[key] = data[key];
+      if (key === 'order') {
+        request[key] = BoardOrder.parse(data[key]);
+      } else {
+        request[key] = data[key];
+      }
     }
   });
 
@@ -45,8 +57,8 @@ BoardPutRequest.validate = (data) => Object.keys(new BoardPutRequest())
         const rule = validation.filter((rule) => rule.field === key)[0];
 
         return rule && (
-            (!rule.nullable && (data[key] === null || data[key] === undefined)) ||
-            (!rule.validate(data[key]))
+            (!rule.optional && (data[key] === null || data[key] === undefined)) ||
+            (data[key] !== null && !rule.validate(data[key]))
           );
       }
     );

@@ -1,7 +1,7 @@
 /*
  * File         :   boards.post.spec.js
  * Description  :   boards POST endpoint tests.
- * ------------------------------------------------------------------------------------------------ */
+ * -------------------------------------------------------------------------------------------------------------------------------------- */
 const chai = require('chai');
 const expect = chai.expect;
 const redis = require('../../providers/redisClient');
@@ -12,17 +12,26 @@ chai.use(chaiHttp);
 
 const board = {
   id: 'my-game-score-board',
-  name: 'My Game Score Board'
+  name: 'My Game Score Board',
+  order: 'lowestFirst'
 };
 
 const invalidBoardId = {
   id: 'This is Invalid',
-  name: 'My Game Score Board'
+  name: 'My Game Score Board',
+  order: 'lowestFirst'
 };
 
 const invalidBoardName = {
   id: 'my-game-score-board',
-  name: 'An Invalid Name!'
+  name: 'An Invalid Name!',
+  order: 'lowestFirst'
+};
+
+const invalidValues = {
+  id: 'Not an id',
+  name: 'An Invalid Name!',
+  order: 'random'
 };
 
 describe('/boards endpoint', () => {
@@ -75,7 +84,7 @@ describe('/boards endpoint', () => {
           expect(!!err).to.equal(true);
           expect(res.headers['content-type']).to.contain('application/json');
           expect(res.body.success).to.equal(false);
-          expect(res.body.fields).to.deep.equal(['id', 'name']);
+          expect(res.body.fields).to.deep.equal(['id', 'name', 'order']);
           done();
         });
     });
@@ -104,6 +113,20 @@ describe('/boards endpoint', () => {
           expect(res.headers['content-type']).to.contain('application/json');
           expect(res.body.success).to.equal(false);
           expect(res.body.fields).to.deep.equal(['name']);
+          done();
+        });
+    });
+
+    it('should validate all field values', (done) => {
+      chai.request(server)
+        .post('/boards')
+        .send(invalidValues)
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          expect(!!err).to.equal(true);
+          expect(res.headers['content-type']).to.contain('application/json');
+          expect(res.body.success).to.equal(false);
+          expect(res.body.fields).to.deep.equal(['id', 'name', 'order']);
           done();
         });
     });

@@ -12,7 +12,8 @@ chai.use(chaiHttp);
 
 const board = {
   id: 'my-game-score-board',
-  name: 'My Game Score Board'
+  name: 'My Game Score Board',
+  order: 'lowestFirst'
 };
 
 describe('/scores endpoint', () => {

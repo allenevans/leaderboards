@@ -1,7 +1,7 @@
 /*
  * File         :   boards.get.spec.js
  * Description  :   boards GET endpoint tests.
- * ------------------------------------------------------------------------------------------------ */
+ * -------------------------------------------------------------------------------------------------------------------------------------- */
 const chai = require('chai');
 const expect = chai.expect;
 const redis = require('../../providers/redisClient');
@@ -12,7 +12,8 @@ chai.use(chaiHttp);
 
 const board = {
   id: 'my-game-score-board',
-  name: 'My Game Score Board'
+  name: 'My Game Score Board',
+  order: 'lowestFirst'
 };
 
 describe('/boards endpoint', () => {

@@ -1,6 +1,6 @@
 /*
  * File         :   ScoreCategory.js
- * Description  :   Enum of board types.
+ * Description  :   Score category value type.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 const ScoreCategory = Object.freeze({
   allTime: 0,
@@ -33,12 +33,12 @@ const ScoreCategory = Object.freeze({
   parse: (value) => {
     return Object.keys(ScoreCategory)
       .reduce((mapped, key) => {
-        if (value === key || Number(value) === (ScoreCategory[key])) {
+        if (value === key || (value !== null && Number(value) === (ScoreCategory[key]))) {
           mapped = ScoreCategory[key];
         }
 
         return mapped;
-      }, ScoreCategory.allTime);
+      }, undefined);
   }
 });
 

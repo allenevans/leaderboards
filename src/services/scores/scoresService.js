@@ -2,6 +2,7 @@
  * File         :   scoresService.js
  * Description  :   Data manipulation services for score entities.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
+const BoardOrder = require('../../types/BoardOrder');
 const boardsService = require('../boards/boardsService');
 const dateUtils = require('../../utils/dateUtils');
 const RecordNotFoundError = require('../../errors/db/RecordNotFoundError');
@@ -59,16 +60,18 @@ const add = (boardId, score) => {
  * @return {Promise}
  */
 const get = (boardId, category, count) => {
-  return new Promise((resolve, reject) => {
-    const key = {
-      [ScoreCategory.allTime]: getAllTimeLeaderboardId(boardId),
-      [ScoreCategory.daily]: getDayLeaderboardId(boardId),
-      [ScoreCategory.weekly]: getWeekLeaderboardId(boardId),
-      [ScoreCategory.monthly]: getMonthLeaderboardId(boardId)
-    }[category || 0];
+  return boardsService.get(boardId)
+    .then((board) => new Promise((resolve, reject) => {
+      const key = {
+        [ScoreCategory.allTime]: getAllTimeLeaderboardId(boardId),
+        [ScoreCategory.daily]  : getDayLeaderboardId(boardId),
+        [ScoreCategory.weekly] : getWeekLeaderboardId(boardId),
+        [ScoreCategory.monthly]: getMonthLeaderboardId(boardId)
+      }[category || 0];
 
-    redis.zrange(key, 0, count - 1, 'WITHSCORES', (err, result) => err ? reject(err) : resolve(result));
-  });
+      const method = board.order === BoardOrder.highestFirst ? 'zrevrange' : 'zrange';
+      redis[method](key, 0, count - 1, 'WITHSCORES', (err, result) => err ? reject(err) : resolve(result));
+    }));
 };
 
 module.exports = {

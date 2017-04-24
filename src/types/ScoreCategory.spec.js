@@ -1,6 +1,6 @@
 /*
  * File         :   ScoreCategory.spec.js
- * Description  :   Enum of board types.
+ * Description  :   tests for score category value types.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 const expect = require('chai').expect;
 const ScoreCategory = require('./ScoreCategory');
@@ -45,9 +45,9 @@ describe('ScoreCategory', () => {
       {input: 'weekly', expected: ScoreCategory.weekly},
       {input: 'monthly', expected: ScoreCategory.monthly},
 
-      {input: null, expected: ScoreCategory.allTime},
-      {input: undefined, expected: ScoreCategory.allTime},
-      {input: 'rubbish', expected: ScoreCategory.allTime}
+      {input: null, expected: undefined},
+      {input: undefined, expected: undefined},
+      {input: 'rubbish', expected: undefined}
     ];
 
     tests.forEach((test) =>

@@ -9,22 +9,22 @@ const validation = [
   {
     field: 'boardId',
     validate: simpleIdentifierValidate,
-    nullable: false
+    optional: false
   },
   {
     field: 'player',
     validate: () => true,
-    nullable: false
+    optional: false
   },
   {
     field: 'timestamp',
     validate: wholeNumberValidate,
-    nullable: false
+    optional: false
   },
   {
     field: 'value',
     validate: wholeNumberValidate,
-    nullable: false
+    optional: false
   }
 ];
 
@@ -64,8 +64,8 @@ ScorePostRequest.validate = (data) => Object.keys(new ScorePostRequest())
         const rule = validation.filter((rule) => rule.field === key)[0];
 
         return rule && (
-            (!rule.nullable && (data[key] === null || data[key] === undefined)) ||
-            (!rule.validate(data[key]))
+            (!rule.optional && (data[key] === null || data[key] === undefined)) ||
+            (data[key] !== null && !rule.validate(data[key]))
           );
       }
     );

@@ -12,7 +12,8 @@ chai.use(chaiHttp);
 
 const board = {
   id: 'my-game-score-board',
-  name: 'My Game Score Board'
+  name: 'My Game Score Board',
+  order: 'lowestFirst'
 };
 
 describe('/boards endpoint', () => {
@@ -81,6 +82,24 @@ describe('/boards endpoint', () => {
           expect(res.headers['content-type']).to.contain('application/json');
           expect(res.body.success).to.equal(false);
           expect(res.body.fields).to.deep.equal(['name']);
+          done();
+        });
+    });
+
+    it('should not process invalid order', (done) => {
+      const modify = {
+        order: 'random'
+      };
+
+      chai.request(server)
+        .put(`/boards/${board.id}`)
+        .send(modify)
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          expect(!!err).to.equal(true);
+          expect(res.headers['content-type']).to.contain('application/json');
+          expect(res.body.success).to.equal(false);
+          expect(res.body.fields).to.deep.equal(['order']);
           done();
         });
     });

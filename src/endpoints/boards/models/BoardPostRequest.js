@@ -3,18 +3,25 @@
  * Description  :   Board POST request model.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 const boardNameValidate = require('../../validation/boardNameValidate');
+const BoardOrder = require('../../../types/BoardOrder');
 const simpleIdentifierValidate = require('../../validation/simpleIdentifierValidate');
+const valueTypeValidate = require('../../validation/valueTypeValidate');
 
 const validation = [
   {
     field: 'id',
     validate: simpleIdentifierValidate,
-    nullable: false
+    optional: false
   },
   {
     field: 'name',
     validate: boardNameValidate,
-    nullable: false
+    optional: false
+  },
+  {
+    field: 'order',
+    validate: valueTypeValidate(BoardOrder),
+    optional: false
   }
 ];
 
@@ -22,6 +29,7 @@ class BoardPostRequest {
   constructor() {
     this.id = null;
     this.name = null;
+    this.order = null;
   }
 }
 
@@ -35,7 +43,11 @@ BoardPostRequest.parse = (data) => {
 
   Object.keys(request).forEach((key) => {
     if (data.hasOwnProperty(key)) {
-      request[key] = data[key];
+      if (key === 'order') {
+        request[key] = BoardOrder.parse(data[key]);
+      } else {
+        request[key] = data[key];
+      }
     }
   });
 
@@ -52,8 +64,8 @@ BoardPostRequest.validate = (data) => Object.keys(new BoardPostRequest())
         const rule = validation.filter((rule) => rule.field === key)[0];
 
         return rule && (
-            (!rule.nullable && (data[key] === null || data[key] === undefined)) ||
-            (!rule.validate(data[key]))
+            (!rule.optional && (data[key] === null || data[key] === undefined)) ||
+            (data[key] !== null && !rule.validate(data[key]))
           );
       }
     );
