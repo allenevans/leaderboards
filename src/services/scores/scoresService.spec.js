@@ -45,7 +45,7 @@ describe('scoresService integration tests', () => {
 
     it('should add a score to the all time leaderboard', () =>
       scoresService.add(board.id, highScore)
-        .then(() => getRank(`sc:${board.id}`, highScore.player))
+        .then(() => getRank(`sc:${board.id}:a`, highScore.player))
         .then((rank) => {
           expect(rank).to.equal(0);
         })
@@ -58,9 +58,9 @@ describe('scoresService integration tests', () => {
         scoresService.add(board.id, highScore)
       ])
         .then(() => Promise.all([
-          getRank(`sc:${board.id}`, highScore.player),
-          getRank(`sc:${board.id}`, midScore.player),
-          getRank(`sc:${board.id}`, lowScore.player)
+          getRank(`sc:${board.id}:a`, highScore.player),
+          getRank(`sc:${board.id}:a`, midScore.player),
+          getRank(`sc:${board.id}:a`, lowScore.player)
         ]))
         .then(([highRank, midRank, lowRank]) => {
           expect(highRank).to.equal(2);

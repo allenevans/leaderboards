@@ -10,7 +10,7 @@ const redis = require('../../providers/redisClient');
 const Score = require('./Score');
 const ScoreCategory = require('../../types/ScoreCategory');
 
-const getAllTimeLeaderboardId = (boardId) => `sc:${boardId}`;
+const getAllTimeLeaderboardId = (boardId) => `sc:${boardId}:a`;
 const getDayLeaderboardId = (boardId) => `sc:${boardId}:d`;
 const getWeekLeaderboardId = (boardId) => `sc:${boardId}:w`;
 const getMonthLeaderboardId = (boardId) => `sc:${boardId}:m`;
