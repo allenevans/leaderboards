@@ -7,16 +7,21 @@ const MalformedRequestError = require('../../errors/http/MalformedRequestError')
 const Score = require('../../services/scores/Score');
 const ScorePostRequest = require('./models/ScorePostRequest');
 const ScorePostResponse = require('./models/ScorePostResponse');
-const scoresService = require('../../../src/services/scores/scoresService');
+const scoresService = require('../../services/scores/scoresService');
+const sessionProtected = require('../../middleware/security/sessionProtected');
 
-endpoint.post('/scores', (req, res, next) => {
+endpoint.post('/scores', sessionProtected, (req, res, next) => {
   const model = ScorePostRequest.parse(req.body);
 
   const errors = [
     ...ScorePostRequest.validate(model)
   ];
 
-  if (errors.length === 0) {
+  if (req.session.boardId !== model.boardId && !~errors.indexOf('boardId')) {
+    errors.push('boardId');
+  }
+
+  if (!errors.length) {
     scoresService.add(model.boardId, new Score(model))
       .then(() =>
         res.status(201)

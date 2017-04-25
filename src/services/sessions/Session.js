@@ -1,19 +1,30 @@
-
- /*
+/*
  * File         :   Session.js
  * Description  :   A JWT Session class.
-* -------------------------------------------------------------------------------------------------------------------------------------- */
- class Session {
-   constructor(params) {
-     this.boardId = null;
-     this.timestamp = null;
+ * -------------------------------------------------------------------------------------------------------------------------------------- */
+class Session {
+  constructor(params) {
+    this.boardId = null;
+    this.timestamp = null;
 
-     Object.keys(this).forEach((key) => {
-       if ((params || {}).hasOwnProperty(key)) {
-         this[key] = params[key];
-       }
-     });
-   }
- }
+    Object.keys(this).forEach((key) => {
+      if ((params || {}).hasOwnProperty(key)) {
+        this[key] = params[key];
+      }
+    });
+  }
+}
 
- module.exports = Session;
+Session.parse = (data) => {
+  const session = new Session();
+
+  Object.keys(session).forEach((key) => {
+    if (data.hasOwnProperty(key)) {
+      session[key] = data[key];
+    }
+  });
+
+  return session;
+};
+
+module.exports = Session;

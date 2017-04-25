@@ -16,7 +16,9 @@ const Session = require('./Session');
 const createSession = (boardId) => {
   return boardsService.get(boardId)
     .then((board) => {
-      if (!board) { return Promise.reject(new AccessDeniedError('Leaderboard not found')); }
+      if (!board) {
+        return Promise.reject(new AccessDeniedError('Leaderboard not found'));
+      }
 
       const session = new Session({
         boardId  : board.id,
@@ -29,6 +31,21 @@ const createSession = (boardId) => {
     });
 };
 
+const validate = (token) => new Promise((resolve, reject) => {
+  // verifies secret and checks exp
+  jwt.verify(token, config.secret, (err, decoded) => {
+    if (err) {
+      return err.message === 'invalid signature' ? resolve(false) : reject(err);
+    }
+
+    const session = Session.parse(decoded);
+
+    boardsService.get(session.boardId)
+      .then((board) => resolve(session), (err) => reject(err));
+  });
+});
+
 module.exports = {
-  createSession
+  createSession,
+  validate
 };

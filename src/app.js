@@ -1,3 +1,7 @@
+/*
+ * File         :   app.js
+ * Description  :   Express server app configuration.
+ * -------------------------------------------------------------------------------------------------------------------------------------- */
 const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
@@ -26,6 +30,7 @@ require('./routes/index')(app);
 
 // error handlers
 app.use(errorHandlers.errorMapperHandler); // translate error types into http error types
+app.use(errorHandlers.errorHeaderHandler); // handles known error types
 app.use(errorHandlers.typedErrorHandler); // handles known error types
 app.use(errorHandlers.pageNotFound); // catch 404 and forward to error handler
 app.use(isDevelopment ? errorHandlers.development : errorHandlers.production);

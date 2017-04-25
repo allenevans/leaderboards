@@ -33,4 +33,24 @@ describe('sessionsService integration tests', () => {
         })
     );
   });
+
+  context('validate', () => {
+    it('should validate a valid token', () =>
+      sessionsService.createSession(seededBoards[0].id)
+        .then(sessionsService.validate)
+        .then((session) => {
+          expect(!!session).to.equal(true);
+          expect(session.boardId).to.equal(seededBoards[0].id);
+        })
+    );
+
+    it('should not validate a invalid token', () =>
+      sessionsService.createSession(seededBoards[0].id)
+        .then((token) => token + '-invalid')
+        .then(sessionsService.validate)
+        .then((valid) => {
+          expect(valid).to.equal(false);
+        })
+    );
+  });
 });

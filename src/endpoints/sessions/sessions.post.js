@@ -17,12 +17,13 @@ endpoint.post('/sessions', (req, res, next) => {
   ];
 
   if (!errors.length) {
-      sessionsService.createSession(model.boardId)
-        .then((token) =>
-          res.status(201)
-            .send(new SessionPostResponse(token))
-        )
-        .catch(next);
+    sessionsService.createSession(model.boardId)
+      .then((token) => {
+        res.set('Authorization', `Bearer ${token}`);
+        res.status(201)
+          .send(new SessionPostResponse());
+      })
+      .catch(next);
   } else {
     next(new MalformedRequestError(errors));
   }

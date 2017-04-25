@@ -31,7 +31,7 @@ describe('/sessions endpoint => POST', () => {
           expect(err).to.equal(null);
           expect(res.headers['content-type']).to.contain('application/json');
           expect(res.body.success).to.equal(true);
-          expect(!!res.body.token).to.equal(true);
+          expect(res.headers.authorization).to.match(/Bearer\s\w+/);
           done();
         });
     });
