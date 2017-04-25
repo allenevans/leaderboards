@@ -3,10 +3,11 @@
  * Description  :   scores POST endpoint tests.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 const chai = require('chai');
+const checksum = require('../../utils/checksum');
 const expect = chai.expect;
 const redis = require('../../providers/redisClient');
 const seedBoards = require('../../tests/seedBoards');
-const server = require('../../../src/app');
+const server = require('../../app');
 
 const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
@@ -21,6 +22,8 @@ const authorize = (boardId) => new Promise((resolve) => {
     })
     .end((err, res) => resolve(res.headers.authorization.split(/\s/)[1]));
 });
+
+const signPayload = (payload, token) => Object.assign(payload, { _signed_: checksum(payload, token)});
 
 describe('/scores endpoint => POST', () => {
   let authToken = null;
@@ -39,13 +42,13 @@ describe('/scores endpoint => POST', () => {
     it('can post a new score', (done) => {
         chai.request(server)
           .post('/scores')
-          .set('x-access-token', authToken)
-          .send({
+          .set('Authorization', `Bearer ${authToken}`)
+          .send(signPayload({
             boardId  : board.id,
             player   : 'player 1',
             timestamp: Date.now(),
             value    : 12345
-          })
+          }, authToken))
           .end((err, res) => {
             expect(res).to.have.status(201);
             expect(err).to.equal(null);
@@ -61,14 +64,14 @@ describe('/scores endpoint => POST', () => {
     it('should require all mandatory fields', (done) => {
       chai.request(server)
         .post('/scores')
-        .set('x-access-token', authToken)
+        .set('Authorization', `Bearer ${authToken}`)
         .send({})
         .end((err, res) => {
           expect(res).to.have.status(400);
           expect(!!err).to.equal(true);
           expect(res.headers['content-type']).to.contain('application/json');
           expect(res.body.success).to.equal(false);
-          expect(res.body.fields).to.deep.equal(['boardId', 'player', 'timestamp', 'value']);
+          expect(res.body.fields).to.deep.equal(['_signed_', 'boardId', 'player', 'timestamp', 'value']);
           done();
         });
     });
@@ -82,6 +85,28 @@ describe('/scores endpoint => POST', () => {
           timestamp: Date.now(),
           value    : 12345
         })
+        .end((err, res) => {
+          expect(res).to.have.status(401);
+          expect(!!err).to.equal(true);
+          expect(res.headers['content-type']).to.contain('application/json');
+          expect(res.body.success).to.equal(false);
+          done();
+        });
+    });
+
+    it('should prevent tampering of the score', (done) => {
+      const signedPayload = signPayload({
+          boardId  : board.id,
+          player   : 'player 1',
+          timestamp: Date.now(),
+          value    : 12345
+        });
+
+      signedPayload.value = 10000; // manipulate the score
+
+      chai.request(server)
+        .post('/scores')
+        .send(signedPayload)
         .end((err, res) => {
           expect(res).to.have.status(401);
           expect(!!err).to.equal(true);

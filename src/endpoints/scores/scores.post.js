@@ -11,10 +11,11 @@ const scoresService = require('../../services/scores/scoresService');
 const sessionProtected = require('../../middleware/security/sessionProtected');
 
 endpoint.post('/scores', sessionProtected, (req, res, next) => {
-  const model = ScorePostRequest.parse(req.body);
+  const payload = Object.assign(req.body, { _token_: req.session.token });
+  const model = ScorePostRequest.parse(payload);
 
   const errors = [
-    ...ScorePostRequest.validate(model)
+    ...ScorePostRequest.validate(model, req)
   ];
 
   if (req.session.boardId !== model.boardId && !~errors.indexOf('boardId')) {

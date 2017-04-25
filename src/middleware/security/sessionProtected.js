@@ -6,7 +6,7 @@ const sessionsService = require('../../services/sessions/sessionsService');
 const UnauthorizedError = require('../../errors/http/UnauthorizedError');
 
 module.exports = (req, res, next) => {
-  const token = req.headers['x-access-token'];
+  const token = (req.headers['authorization'] || '').replace(/^Bearer\s+/, '');
 
   if (!token) {
     return next(new UnauthorizedError('Token missing'));
@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
     sessionsService.validate(token)
       .then((session) => {
         if (session) {
-          req.session = session;
+          req.session = Object.assign(session, {token});
         }
 
         next(session ? undefined : new UnauthorizedError('Token invalid'));

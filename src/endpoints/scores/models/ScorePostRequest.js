@@ -2,11 +2,17 @@
  * File         :   ScorePostRequest.js
  * Description  :   Score POST request model.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
+const signatureValidate = require('../../validation/signatureValidate');
 const requestModelValidate = require('../../validation/requestModelValidate');
 const simpleIdentifierValidate = require('../../validation/simpleIdentifierValidate');
 const wholeNumberValidate = require('../../validation/wholeNumberValidate');
 
 const rules = [
+  {
+    field: '_signed_',
+    validate: signatureValidate,
+    optional: false
+  },
   {
     field: 'boardId',
     validate: simpleIdentifierValidate,
@@ -31,6 +37,7 @@ const rules = [
 
 class ScorePostRequest {
   constructor() {
+    this._signed_ = null;
     this.boardId = null;
     this.player = null;
     this.timestamp = null;
@@ -56,7 +63,7 @@ ScorePostRequest.parse = (data) => {
 };
 
 /**
- * Validate fields, return an array of errors.
+ * Validate model against the request. Return an array of field names in error.
  * @param data
  */
 ScorePostRequest.validate = requestModelValidate(ScorePostRequest, rules);
