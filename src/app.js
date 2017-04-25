@@ -8,11 +8,16 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const errorHandlers = require('./middleware/errors/index');
 
 const app = express();
 const isDevelopment = app.get('env') === 'development';
+
+app.use(cors({
+  exposedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
