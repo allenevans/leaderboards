@@ -2,6 +2,7 @@
  * File         :   scores.post.spec.js
  * Description  :   scores POST endpoint tests.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
+const appsService = require('../../services/apps/appsService');
 const chai = require('chai');
 const checksum = require('../../utils/checksum');
 const expect = chai.expect;
@@ -23,7 +24,9 @@ const authorize = (boardId) => new Promise((resolve) => {
     .end((err, res) => resolve(res.headers.authorization.split(/\s/)[1]));
 });
 
-const signPayload = (payload, token) => Object.assign(payload, { _signed_: checksum(payload, token)});
+const signPayload = (payload, token, appId) => appsService.get(appId).then((app) => new Promise((resolve) => {
+  resolve(checksum(payload, `${app.accessKey}-${token}`));
+}));
 
 describe('/scores endpoint => POST', () => {
   let authToken = null;
@@ -40,22 +43,28 @@ describe('/scores endpoint => POST', () => {
 
   context('adding scores', () => {
     it('can post a new score', (done) => {
-        chai.request(server)
-          .post('/scores')
-          .set('Authorization', `Bearer ${authToken}`)
-          .send(signPayload({
-            boardId  : board.id,
-            player   : 'player 1',
-            timestamp: Date.now(),
-            value    : 12345
-          }, authToken))
-          .end((err, res) => {
-            expect(res).to.have.status(201);
-            expect(err).to.equal(null);
-            expect(res.headers['content-type']).to.contain('application/json');
-            expect(res.body.success).to.equal(true);
-            done();
-          });
+        const payload = {
+          boardId  : board.id,
+          player   : 'player 1',
+          timestamp: Date.now(),
+          value    : 12345
+        };
+
+        signPayload(payload, authToken, board.appId)
+          .then((checksum) => {
+            chai.request(server)
+              .post('/scores')
+              .set('Authorization', `Bearer ${authToken}`)
+              .set('x-checksum', checksum)
+              .send(payload)
+              .end((err, res) => {
+                expect(res).to.have.status(201);
+                expect(err).to.equal(null);
+                expect(res.headers['content-type']).to.contain('application/json');
+                expect(res.body.success).to.equal(true);
+                done();
+              });
+          })
       }
     );
   });
@@ -71,7 +80,7 @@ describe('/scores endpoint => POST', () => {
           expect(!!err).to.equal(true);
           expect(res.headers['content-type']).to.contain('application/json');
           expect(res.body.success).to.equal(false);
-          expect(res.body.fields).to.deep.equal(['_signed_', 'boardId', 'player', 'timestamp', 'value']);
+          expect(res.body.fields).to.deep.equal(['checksum']);
           done();
         });
     });
@@ -95,25 +104,29 @@ describe('/scores endpoint => POST', () => {
     });
 
     it('should prevent tampering of the score', (done) => {
-      const signedPayload = signPayload({
-          boardId  : board.id,
-          player   : 'player 1',
-          timestamp: Date.now(),
-          value    : 12345
-        });
+      const payload = {
+        boardId  : board.id,
+        player   : 'player 1',
+        timestamp: Date.now(),
+        value    : 12345
+      };
+      signPayload(payload, authToken, board.appId).then((checksum) => {
+        payload.value = 10000; // manipulate the score
 
-      signedPayload.value = 10000; // manipulate the score
-
-      chai.request(server)
-        .post('/scores')
-        .send(signedPayload)
-        .end((err, res) => {
-          expect(res).to.have.status(401);
-          expect(!!err).to.equal(true);
-          expect(res.headers['content-type']).to.contain('application/json');
-          expect(res.body.success).to.equal(false);
-          done();
-        });
+        chai.request(server)
+          .post('/scores')
+          .set('Authorization', `Bearer ${authToken}`)
+          .set('x-checksum', checksum)
+          .send(payload)
+          .end((err, res) => {
+            expect(res).to.have.status(400);
+            expect(!!err).to.equal(true);
+            expect(res.headers['content-type']).to.contain('application/json');
+            expect(res.body.success).to.equal(false);
+            expect(res.body.fields).to.deep.equal(['checksum']);
+            done();
+          });
+      });
     });
   });
 });

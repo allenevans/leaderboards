@@ -21,6 +21,7 @@ const createSession = (boardId) => {
       }
 
       const session = new Session({
+        appId    : board.appId,
         boardId  : board.id,
         timestamp: Date.now()
       });

@@ -12,6 +12,7 @@ module.exports = (count) => new Promise((resolve) => {
 
   for (let i = 0; i < count; i++) {
     apps.push(new Application({
+      accessKey: Math.random().toString(31).substring(2, 34),
       id: uuid(),
       name: `${random.first()} ${random.place()}`
     }));

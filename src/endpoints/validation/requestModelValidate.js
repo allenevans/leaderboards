@@ -13,14 +13,14 @@
   *   optional: false
   * }
  */
-module.exports = (Model, rules) => (data, req) => Object.keys(new Model())
+module.exports = (Model, rules) => (data) => Object.keys(new Model())
   .filter(
     (key) => {
       const rule = rules.filter((rule) => rule.field === key)[0];
 
       return rule && (
           (!rule.optional && (data[key] === null || data[key] === undefined)) ||
-          (data[key] !== null && !rule.validate(data[key], data, req))
+          (data[key] !== null && !rule.validate(data[key], data))
         );
     }
   );

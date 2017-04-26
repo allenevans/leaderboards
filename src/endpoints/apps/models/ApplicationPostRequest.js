@@ -4,6 +4,7 @@
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 const applicationNameValidate = require('../../validation/applicationNameValidate');
 const requestModelValidate = require('../../validation/requestModelValidate');
+const stringValidate = require('../../validation/stringValidate');
 const uuidV4 = require('uuid/v4');
 const uuidValidate = require('../../validation/uuidValidate');
 
@@ -17,6 +18,11 @@ const rules = [
     field: 'name',
     validate: applicationNameValidate,
     optional: false
+  },
+  {
+    field: 'accessKey',
+    validate: stringValidate(1000, 8),
+    optional: true
   }
 ];
 
@@ -24,6 +30,7 @@ class ApplicationPostRequest {
   constructor() {
     this.id = uuidV4();
     this.name = null;
+    this.accessKey = Math.random().toString(31).substring(2, 34);
   }
 }
 

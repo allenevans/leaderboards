@@ -2,6 +2,7 @@
  * File         :   scores.post.js
  * Description  :   Post a score to a leaderboard.
  * -------------------------------------------------------------------------------------------------------------------------------------- */
+const appsService = require('../../services/apps/appsService');
 const endpoint = require('express').Router();
 const MalformedRequestError = require('../../errors/http/MalformedRequestError');
 const Score = require('../../services/scores/Score');
@@ -9,10 +10,10 @@ const ScorePostRequest = require('./models/ScorePostRequest');
 const ScorePostResponse = require('./models/ScorePostResponse');
 const scoresService = require('../../services/scores/scoresService');
 const sessionProtected = require('../../middleware/security/sessionProtected');
+const checksum = require('../../middleware/security/checksumMiddleware');
 
-endpoint.post('/scores', sessionProtected, (req, res, next) => {
-  const payload = Object.assign(req.body, { _token_: req.session.token });
-  const model = ScorePostRequest.parse(payload);
+endpoint.post('/scores', sessionProtected, checksum, (req, res, next) => {
+  const model = ScorePostRequest.parse(req.body);
 
   const errors = [
     ...ScorePostRequest.validate(model, req)

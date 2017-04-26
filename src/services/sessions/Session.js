@@ -4,6 +4,7 @@
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 class Session {
   constructor(params) {
+    this.appId = null;
     this.boardId = null;
     this.timestamp = null;
 

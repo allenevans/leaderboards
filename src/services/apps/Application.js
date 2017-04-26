@@ -4,6 +4,7 @@
  * -------------------------------------------------------------------------------------------------------------------------------------- */
 class Application {
   constructor(params) {
+    this.accessKey = null;
     this.id = null;
     this.name = null;
 
