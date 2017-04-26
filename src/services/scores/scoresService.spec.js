@@ -65,6 +65,20 @@ describe('scoresService integration tests', () => {
         })
     );
 
+    it('should not overwrite lower ranking scores', (done) => {
+      // default sorting: lowest score first.
+      const score1 = highScore;
+      const score2 = Object.assign({}, highScore, { value: highScore.value +  1});
+
+      scoresService.add(board.id, score1)
+        .then(() => scoresService.add(board.id, score2))
+        .then(() => scoresService.getPlayerScores(board.id, score2.player))
+        .then((scores) => {
+          expect(scores).to.deep.equal([score1.value, score1.value, score1.value, score1.value]);
+          done();
+        });
+    });
+
     it('should add a score to the monthly leaderboard', () =>
       scoresService.add(board.id, highScore)
         .then(() => getRank(`sc:${board.id}:m`, highScore.player))

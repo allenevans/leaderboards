@@ -15,14 +15,22 @@ const getDayLeaderboardId = (boardId) => `sc:${boardId}:d`;
 const getWeekLeaderboardId = (boardId) => `sc:${boardId}:w`;
 const getMonthLeaderboardId = (boardId) => `sc:${boardId}:m`;
 
+const isHigherRankingScore = (currentScore, newScore, order) =>
+  currentScore === null ||
+    (order === BoardOrder.highestFirst && newScore > currentScore) ||
+    (order === BoardOrder.lowestFirst && newScore < currentScore);
+
 /**
  * Add a new score for the given board
  * @param boardId
  * @param score
  */
 const add = (boardId, score) => {
-  return boardsService.get(boardId)
-    .then((board) => {
+  return Promise.all([
+    boardsService.get(boardId),
+    getPlayerScores(boardId, score.player)
+  ])
+    .then(([board, [allTime, monthly, weekly, daily]]) => {
       if (!board) {
         return Promise.reject(new RecordNotFoundError(boardId));
       }
@@ -30,24 +38,39 @@ const add = (boardId, score) => {
       const now = Date.now();
 
       return new Promise((resolve, reject) => {
-        redis
-          .multi()
-          // all time leaderboard
-          .zadd(getAllTimeLeaderboardId(board.id), score.value, Score.serialize(new Score(score)))
+        let query = redis.multi();
 
-          // daily leaderboard
-          .zadd(getDayLeaderboardId(board.id), score.value, Score.serialize(new Score(score)))
-          .expire(getDayLeaderboardId(board.id), dateUtils.secondsRemainingInDay(now))
+        // all time leaderboard
+        if (isHigherRankingScore(allTime, score.value, board.order)) {
+          query = query.zadd(getAllTimeLeaderboardId(board.id), score.value, Score.serialize(new Score(score)));
+          allTime = score.value;
+        }
 
-          // weekly leaderboard
-          .zadd(getWeekLeaderboardId(board.id), score.value, Score.serialize(new Score(score)))
-          .expire(getWeekLeaderboardId(board.id), dateUtils.secondsRemainingInWeek(now))
+        // monthly leaderboard
+        if (isHigherRankingScore(monthly, score.value, board.order)) {
+          query = query
+            .zadd(getMonthLeaderboardId(board.id), score.value, Score.serialize(new Score(score)))
+            .expire(getMonthLeaderboardId(board.id), dateUtils.secondsRemainingInMonth(now));
+          monthly = score.value;
+        }
 
-          // // monthly leaderboard
-          .zadd(getMonthLeaderboardId(board.id), score.value, Score.serialize(new Score(score)))
-          .expire(getMonthLeaderboardId(board.id), dateUtils.secondsRemainingInMonth(now))
+        // weekly leaderboard
+        if (isHigherRankingScore(weekly, score.value, board.order)) {
+          query = query
+            .zadd(getWeekLeaderboardId(board.id), score.value, Score.serialize(new Score(score)))
+            .expire(getWeekLeaderboardId(board.id), dateUtils.secondsRemainingInWeek(now));
+          weekly = score.value;
+        }
 
-          .exec((err) => err ? reject(err) : resolve(board.id));
+        // daily leaderboard
+        if (isHigherRankingScore(daily, score.value, board.order)) {
+          query = query
+            .zadd(getDayLeaderboardId(board.id), score.value, Score.serialize(new Score(score)))
+            .expire(getDayLeaderboardId(board.id), dateUtils.secondsRemainingInDay(now));
+          daily = score.value;
+        }
+
+        query.exec((err) => err ? reject(err) : resolve([allTime, monthly, weekly, daily]));
       });
     });
 };
@@ -74,7 +97,23 @@ const get = (boardId, category, count) => {
     }));
 };
 
+/**
+ * Get the players recorded score for all leaderboards
+ * @param boardId
+ * @param player
+ */
+const getPlayerScores = (boardId, player) => new Promise((resolve, reject) =>
+  redis
+    .multi()
+    .zscore(`sc:${boardId}:a`, player)
+    .zscore(`sc:${boardId}:m`, player)
+    .zscore(`sc:${boardId}:w`, player)
+    .zscore(`sc:${boardId}:d`, player)
+    .exec((err, results) => err ? reject(err) : resolve(results.map(score => score === null ? null : Number(score))))
+);
+
 module.exports = {
   add,
-  get
+  get,
+  getPlayerScores
 };
